@@ -1,0 +1,15 @@
+Tablename - Employees
+Row key - Employee_Ids
+Column Families - Personal Details, Professional Details
+Personal Details Columns =>
+    - Name
+    - Age
+    - Phone Number
+    - Address
+    - Gender
+    - Email Address
+Professional Details Columns =>
+    - Education
+    - Salary
+    - Current Position
+    - Current Company
