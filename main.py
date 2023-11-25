@@ -9,11 +9,9 @@ hbase_host = 'hadoop'
 hbase_port = 9090 
 auth_utils = AuthUtils(hbase_host, hbase_port)
 
-# Initialize HBase table for users if it doesn't exist
 if b'users' not in auth_utils.connection.tables():
     auth_utils.create_user_table()
 
-# API resource for user registration
 class Register(Resource):
     def post(self):
         data = request.get_json()
@@ -31,8 +29,6 @@ class Register(Resource):
         except Exception as e:
             response = {'error': str(e)}
             return jsonify(response)
-
-# API resource for user authentication
 class Authenticate(Resource):
     def post(self):
         data = request.get_json()
@@ -55,8 +51,47 @@ class Authenticate(Resource):
             response = {'error': str(e)}
             return jsonify(response)
 
+class UpdatePersonalInfo(Resource):
+    def post(self, username):
+        data = request.get_json()
+        info = {
+            'name': data.get('name'),
+            'gender': data.get('gender'),
+            'phone_number': data.get('phone_number'),
+            'address': data.get('address'),
+            'age': data.get('age'),
+            'email': data.get('email'),
+        }
+
+        if any(value is None for value in info.values()):
+            response = {'error': 'All fields are required'}
+            return jsonify(response)
+
+        try:
+            auth_utils.update_personal_info(username, info)
+            response = {'message': 'User information updated successfully'}
+            return jsonify(response)
+        except Exception as e:
+            response = {'error': str(e)}
+            return jsonify(response)
+
+class DisplayPersonalInfo(Resource):
+    def get(self, username):
+        try:
+            user_info = auth_utils.get_personal_info(username)
+            if user_info:
+                return jsonify(user_info)
+            else:
+                response = {'error': 'User not found'}
+                return jsonify(response), 404
+        except Exception as e:
+            response = {'error': str(e)}
+            return jsonify(response), 500
+
 api.add_resource(Register, '/register')
 api.add_resource(Authenticate, '/authenticate')
+api.add_resource(UpdatePersonalInfo, '/update_personal_info/<username>')
+api.add_resource(DisplayPersonalInfo, '/display_personal_info/<username>')
 
 if __name__ == '__main__':
     app.run(debug=True)

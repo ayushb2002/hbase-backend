@@ -21,3 +21,14 @@ class AuthUtils:
         # Add a new user to the HBase table
         table = self.connection.table('users')
         table.put(username.encode('utf-8'), {'auth:password': password.encode('utf-8')})
+
+    def update_personal_info(self, username, info):
+        # Update user information in the HBase table
+        table = self.connection.table('users')
+        table.put(username.encode('utf-8'), {'info:' + key: str(value).encode('utf-8') for key, value in info.items()})
+
+    def get_personal_info(self, username):
+        # Get user information from the HBase table
+        table = self.connection.table('users')
+        user_info = table.row(username.encode('utf-8'), columns=[b'info:name', b'info:gender', b'info:phone_number', b'info:address', b'info:age', b'info:email'])
+        return {key.decode('utf-8').split(':')[1]: value.decode('utf-8') for key, value in user_info.items()}
