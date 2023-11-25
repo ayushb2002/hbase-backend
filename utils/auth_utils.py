@@ -32,3 +32,14 @@ class AuthUtils:
         table = self.connection.table('users')
         user_info = table.row(username.encode('utf-8'), columns=[b'info:name', b'info:gender', b'info:phone_number', b'info:address', b'info:age', b'info:email'])
         return {key.decode('utf-8').split(':')[1]: value.decode('utf-8') for key, value in user_info.items()}
+    
+    def update_professional_info(self, username, professional_info):
+        # Update professional information in the HBase table
+        table = self.connection.table('users')
+        table.put(username.encode('utf-8'), {'prof:' + key: str(value).encode('utf-8') for key, value in professional_info.items()})
+
+    def get_professional_info(self, username):
+        # Get professional information from the HBase table
+        table = self.connection.table('users')
+        prof_info = table.row(username.encode('utf-8'), columns=[b'prof:12th_percentage', b'prof:graduation_year', b'prof:degree_pursued', b'prof:employment_status', b'prof:office_name', b'prof:salary', b'prof:current_designation', b'prof:experience'])
+        return {key.decode('utf-8').split(':')[1]: value.decode('utf-8') for key, value in prof_info.items()}

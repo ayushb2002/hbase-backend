@@ -83,15 +83,55 @@ class DisplayPersonalInfo(Resource):
                 return jsonify(user_info)
             else:
                 response = {'error': 'User not found'}
-                return jsonify(response), 404
+                return jsonify(response)
         except Exception as e:
             response = {'error': str(e)}
-            return jsonify(response), 500
+            return jsonify(response)
+
+class UpdateProfessionalInfo(Resource):
+    def post(self, username):
+        data = request.get_json()
+        professional_info = {
+            '12th_percentage': data.get('12th_percentage'),
+            'graduation_year': data.get('graduation_year'),
+            'degree_pursued': data.get('degree_pursued'),
+            'employment_status': data.get('employment_status'),
+            'office_name': data.get('office_name'),
+            'salary': data.get('salary'),
+            'current_designation': data.get('current_designation'),
+            'experience': data.get('experience'),
+        }
+
+        if any(value is None for value in professional_info.values()):
+            response = {'error': 'All fields are required'}
+            return jsonify(response)
+
+        try:
+            auth_utils.update_professional_info(username, professional_info)
+            response = {'message': 'Professional information updated successfully'}
+            return jsonify(response)
+        except Exception as e:
+            response = {'error': str(e)}
+            return jsonify(response)
+class DisplayProfessionalInfo(Resource):
+    def get(self, username):
+        try:
+            prof_info = auth_utils.get_professional_info(username)
+            if prof_info:
+                return jsonify(prof_info)
+            else:
+                response = {'error': 'Professional information not found'}
+                return jsonify(response)
+        except Exception as e:
+            response = {'error': str(e)}
+            return jsonify(response)
 
 api.add_resource(Register, '/register')
 api.add_resource(Authenticate, '/authenticate')
 api.add_resource(UpdatePersonalInfo, '/update_personal_info/<username>')
 api.add_resource(DisplayPersonalInfo, '/display_personal_info/<username>')
+api.add_resource(UpdateProfessionalInfo, '/update_professional_info/<username>')
+api.add_resource(DisplayProfessionalInfo, '/display_professional_info/<username>')
 
 if __name__ == '__main__':
     app.run(debug=True)

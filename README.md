@@ -7,5 +7,6 @@ $ hbase-daemon.sh start thrift -p 9090 --infoport 9091 <br>
 
 ## To stop HBase and Hadoop - 
 <br>
+$ hbase-daemon.sh stop thrift <br>
 $ stop-hbase.sh <br>
 $ stop-all.sh <br>
