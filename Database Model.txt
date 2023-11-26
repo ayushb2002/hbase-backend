@@ -1,6 +1,6 @@
 Tablename - users
 Row key - username
-Column Families - info, prof
+Column Families - info, prof, auth
 Personal Details (info) Columns =>
     - name
     - age
@@ -17,3 +17,6 @@ Professional Details (prof) Columns =>
     - office_name
     - salary
     - experience
+Authentication (auth) Columns =>
+    - password
+    - employee
