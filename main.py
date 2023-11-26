@@ -6,7 +6,7 @@ app = Flask(__name__)
 api = Api(app)
 
 hbase_host = 'hadoop'  
-hbase_port = 9090 
+hbase_port = 9090
 auth_utils = AuthUtils(hbase_host, hbase_port)
 
 if b'users' not in auth_utils.connection.tables():
@@ -17,13 +17,14 @@ class Register(Resource):
         data = request.get_json()
         username = data.get('username')
         password = data.get('password')
+        employee = 'true' if data.get('employee') == True else 'false'
 
-        if not username or not password:
+        if not username or not password or not employee:
             response = {'error': 'Username and password are required'}
             return jsonify(response)
 
         try:
-            auth_utils.add_user(username, password)
+            auth_utils.add_user(username, password, employee)
             response = {'message': 'User registered successfully'}
             return jsonify(response)
         except Exception as e:
@@ -125,6 +126,36 @@ class DisplayProfessionalInfo(Resource):
         except Exception as e:
             response = {'error': str(e)}
             return jsonify(response)
+        
+class RecentSubmissions(Resource):
+    def get(self, employee):
+        try:
+            recent_submissions = auth_utils.get_recent_submissions(employee)
+            return jsonify(recent_submissions)
+        except Exception as e:
+            response = {'error': str(e)}
+            return jsonify(response)
+
+class ViewAndVerifyProfile(Resource):
+    def get(self, username):
+        try:
+            profile_info = auth_utils.get_user_profile(username)
+            if profile_info:
+                return jsonify(profile_info)
+            else:
+                response = {'error': 'User not found'}
+                return jsonify(response), 404
+        except Exception as e:
+            response = {'error': str(e)}
+            return jsonify(response), 500
+    def post(self, username):
+        try:
+            auth_utils.mark_profile_as_verified(username)
+            response = {'message': f'Profile for {username} marked as verified'}
+            return jsonify(response)
+        except Exception as e:
+            response = {'error': e.decode('utf-8')}
+            return jsonify(response)
 
 api.add_resource(Register, '/register')
 api.add_resource(Authenticate, '/authenticate')
@@ -132,6 +163,8 @@ api.add_resource(UpdatePersonalInfo, '/update_personal_info/<username>')
 api.add_resource(DisplayPersonalInfo, '/display_personal_info/<username>')
 api.add_resource(UpdateProfessionalInfo, '/update_professional_info/<username>')
 api.add_resource(DisplayProfessionalInfo, '/display_professional_info/<username>')
+api.add_resource(RecentSubmissions, '/recent_submissions/<employee>')
+api.add_resource(ViewAndVerifyProfile, '/view_and_verify_profile/<username>')
 
 if __name__ == '__main__':
     app.run(debug=True)

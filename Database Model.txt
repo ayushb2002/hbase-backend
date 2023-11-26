@@ -1,15 +1,19 @@
-Tablename - Employees
-Row key - Employee_Ids
-Column Families - Personal Details, Professional Details
-Personal Details Columns =>
-    - Name
-    - Age
-    - Phone Number
-    - Address
-    - Gender
-    - Email Address
-Professional Details Columns =>
-    - Education
-    - Salary
-    - Current Position
-    - Current Company
+Tablename - users
+Row key - username
+Column Families - info, prof
+Personal Details (info) Columns =>
+    - name
+    - age
+    - phone_number
+    - address
+    - gender
+    - email
+Professional Details (prof) Columns =>
+    - class_12_percentage
+    - degree_pursued
+    - current_designation
+    - graduation_year
+    - employment_status
+    - office_name
+    - salary
+    - experience
